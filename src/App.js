@@ -1,37 +1,28 @@
 import React from 'react'
-import logo from './logo.svg';
 import './App.css';
-import {
-  getAllTasks,
-  getAllTasksNew
-} from './core/api/api';
+import { loadTasksThunk } from './core/thunks';
+import {connect} from 'react-redux';
+import Navbar from './Components/Navbar/Navbar';
+import Tasks from './Components/TasksPage/Tasks';
+
 
 class App extends React.Component {
   componentDidMount() {
-    const getAllTasksThunk=async()=>{
-      const allTasks=await getAllTasks()
-      console.log(allTasks)
-    }
-
-    // так тоже работает
-    // раньше не работало потому что перед getAllTasks() должен был стоять await т.к. функция getAllTasks() возвращает нам промис 
-    // несмотря на все awaitы внутри нее
-    getAllTasksThunk()
-    
-    // так работает
-    getAllTasks().then(data=>console.log(data))
-
-    // так не работает потому что перед getAllTasks() должен был стоять await т.к. функция getAllTasks() возвращает нам промис 
-    // несмотря на все awaitы внутри нее
-    const tasks=getAllTasks()
-    console.log(tasks)
+    this.props.loadTasksThunk(this.props.currentTasksStatus)
   }
   render() {
-
-    return ( 
-      <div>toDoLIst</div>
+    return (
+      <div className='app-wrapper'> 
+        <Navbar/>
+        <Tasks/>
+      </div>
     )
   }
 }
 
-export default App;
+const mapStateToProps=state=>({
+  tasks:state.tasksReducer.tasks,
+  currentTasksStatus:state.tasksReducer.currentTasksStatus
+})
+
+export default connect (mapStateToProps,{loadTasksThunk})(App);
